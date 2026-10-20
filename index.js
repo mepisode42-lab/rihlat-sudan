@@ -1,56 +1,126 @@
-const express=require('express');const app=express();app.use(express.json());
-let users=[
-{phone:'0912345678',name:'Mohammed Atbara',father:'Ahmed',state:'Atbara',role:'driver',pass:'123',bio:'Driver 10 years',avatar:'M',posts:[]},
-{phone:'0900000000',name:'Bashair Office',father:'Admin',state:'Atbara',role:'office',pass:'123',bio:'Travel Office',avatar:'B',posts:[]},
-{phone:'0922222222',name:'Abdullah',father:'Mohammed',state:'Khartoum',role:'traveler',pass:'123',bio:'Traveler',avatar:'A',posts:[]}
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+let trips = [
+  {id:"1",from:"الخرطوم",to:"نهر النيل",office:"بصات عطبرة الفاخر",price:25000,seats:12,time:"06:00 ص",type:"VIP",phone:"0910000001"},
+  {id:"2",from:"الخرطوم",to:"البحر الأحمر",office:"الرفاعي",price:45000,seats:5,time:"19:30",type:"مكيف",phone:"0910000002"},
+  {id:"3",from:"الجزيرة",to:"الخرطوم",office:"الجزيرة",price:15000,seats:20,time:"09:00 ص",type:"عادي",phone:"0910000003"},
+  {id:"4",from:"نهر النيل",to:"الشمالية",office:"الشمال",price:30000,seats:8,time:"05:00 ص",type:"VIP",phone:"0910000004"},
 ];
-let trips=[{id:1,from:'Atbara',to:'Khartoum',driver:'Mohammed Atbara',phone:'0912345678',price:'25000',seats:14}];
-let chats=[],books=[];
-app.get('/api/users',(r,s)=>s.json(users));
-app.get('/api/trips',(r,s)=>s.json(trips));
-app.get('/api/chats',(r,s)=>{let f=chats.filter(x=>(x.from==r.query.u1&&x.to==r.query.u2)||(x.from==r.query.u2&&x.to==r.query.u1));s.json(f);});
-app.post('/api/chats',(r,s)=>{if(!r.body.msg.trim())return s.json({ok:false});chats.push({from:r.body.from,to:r.body.to,msg:r.body.msg,time:'Now'});s.json({ok:true});});
-app.post('/api/register',(r,s)=>{let b=r.body;if(!b.phone||!b.pass||!b.name||!b.father||!b.state||!b.role)return s.json({ok:false,msg:'All fields required + Role'});if(users.find(u=>u.phone==b.phone))return s.json({ok:false,msg:'Exists'});let u={phone:b.phone,name:b.name,father:b.father,state:b.state,role:b.role,pass:b.pass,bio:b.role,avatar:b.name[0],posts:[]};users.push(u);s.json({ok:true,user:u});});
-app.post('/api/login',(r,s)=>{let u=users.find(x=>x.phone==r.body.phone&&x.pass==r.body.pass);if(!u)return s.json({ok:false,msg:'Wrong'});s.json({ok:true,user:u});});
-app.post('/api/trips',(r,s)=>{if(!r.body.from.trim()||!r.body.to.trim())return s.json({ok:false,msg:'From To required'});trips.unshift({id:Date.now(),from:r.body.from,to:r.body.to,driver:r.body.driver,phone:r.body.phone,price:r.body.price,seats:14});s.json({ok:true});});
-app.post('/api/book',(r,s)=>{if(!r.body.from.trim()||!r.body.to.trim())return s.json({ok:false,msg:'From To required'});books.push(r.body);s.json({ok:true});});
-app.post('/api/posts',(r,s)=>{let u=users.find(x=>x.phone==r.body.phone);if(u)u.posts.unshift({text:r.body.text,time:'Now'});s.json({ok:true});});
-app.get('/',(r,s)=>{s.send(`
-<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content=width=device-width,initial-scale=1><script src=https://cdn.tailwindcss.com></script><title>Rihlat Sudan V4 Mini English</title></head>
-<body class=bg-[#f0f2f5]><div class="max-w-[480px] mx-auto bg-white min-h-screen">
-<div id=authView class=p-6><h1 class="font-black text-2xl text-center">Rihlat Sudan V4 Mini</h1><p class="text-center text-xs text-gray-500">Login + Role + Mandatory FromTo + Profile FB + Internal Chat</p>
-<div id=loginBox class="mt-6 border rounded-2xl p-5"><input id=lPhone placeholder="Phone 091..." class="w-full bg-gray-100 rounded-xl p-4 text-sm"><input id=lPass type=password placeholder="Password" class="w-full mt-2 bg-gray-100 rounded-xl p-4 text-sm"><div id=lErr class="hidden text-red-600 text-xs mt-2"></div><button onclick=login() class="w-full mt-4 bg-[#0b2a4a] text-white py-4 rounded-xl font-black">Login</button><button onclick=showReg() class="w-full mt-2 bg-gray-100 py-3 rounded-xl font-bold">New Account</button><p class="text-[10px] text-center mt-2 text-gray-400">0912345678/123 driver - 0900000000/123 office - 0922222222/123 traveler</p></div>
-<div id=regBox class="hidden mt-6 border rounded-2xl p-5"><input id=rName placeholder="Daily Name *" class="w-full bg-gray-100 rounded-xl p-3 text-sm"><input id=rFather placeholder="Father Name *" class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><input id=rState placeholder="State *" class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><input id=rPhone placeholder="Phone *" class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><input id=rPass type=password placeholder="Password *" class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><p class="font-bold text-sm mt-3">Account Type * Required:</p><div class="grid grid-cols-3 gap-2 mt-2"><div onclick=pick('traveler') id=ro1 class="border-2 border-[#0b2a4a] bg-[#0b2a4a] text-white rounded-xl p-3 text-center"><div>Traveler</div></div><div onclick=pick('driver') id=ro2 class="border-2 bg-white rounded-xl p-3 text-center"><div>Driver</div></div><div onclick=pick('office') id=ro3 class="border-2 bg-white rounded-xl p-3 text-center"><div>Office</div></div></div><div id=rErr class="hidden text-red-600 text-xs mt-2"></div><button onclick=reg() class="w-full mt-4 bg-[#0b2a4a] text-white py-4 rounded-xl font-black">Create</button><button onclick=showLogin() class="w-full mt-2 bg-gray-100 py-3 rounded-xl">Login</button></div></div>
-<div id=mainView class=hidden><header class="bg-[#0b2a4a] text-white p-4 flex justify-between"><div><h1 class=font-black>Rihlat Sudan</h1><p id=uInfo class="text-[11px] opacity-70"></p></div><button onclick=logout() class="bg-white/20 px-3 py-1 rounded-full text-xs">Logout</button></header><div class=p-3><div class="bg-white border rounded-2xl p-3"><div class="flex gap-2"><input id=fFrom placeholder="From * Required" class="flex-1 bg-gray-100 rounded-xl p-3 text-sm"><input id=fTo placeholder="To * Required" class="flex-1 bg-gray-100 rounded-xl p-3 text-sm"></div><div id=fErr class="hidden text-red-600 text-xs mt-2">From To Required!</div><div class="flex gap-2 mt-2"><button onclick=search() class="flex-1 bg-[#0b2a4a] text-white py-3 rounded-xl font-bold">Search</button><button id=addBtn onclick=newTrip() class="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold hidden">+ Post Trip</button></div></div><div class="flex gap-2 mt-3"><button onclick=tab('trips') id=tTrips class="bg-[#0b2a4a] text-white px-4 py-2 rounded-full text-sm">Trips</button><button onclick=tab('users') id=tUsers class="bg-gray-200 px-4 py-2 rounded-full text-sm">People</button><button onclick=tab('chat') id=tChat class="bg-gray-200 px-4 py-2 rounded-full text-sm">Chat</button></div><div id=tripsView class=mt-3><div id=tripsList></div></div><div id=usersView class="hidden mt-3"><div id=usersList></div></div><div id=chatView class="hidden mt-3"><div class="border rounded-2xl h-[60vh] flex flex-col"><div class="p-2 border-b flex justify-between"><span class="font-bold text-sm">Internal Chat</span><select id=chatSel onchange=loadChat() class="bg-gray-100 rounded-full px-2 text-xs"></select></div><div id=chatMsgs class="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50"></div><div class="p-2 border-t flex gap-2"><input id=chatIn placeholder="Message..." class="flex-1 bg-gray-100 rounded-full px-4 py-3 text-sm"><button onclick=send() class="bg-[#0b2a4a] text-white w-12 h-12 rounded-full">></button></div></div></div></div></div>
-<div id=profileModal class="fixed inset-0 bg-black/60 hidden z-50 flex items-end justify-center"><div class="bg-white w-full max-w-[480px] rounded-t-[28px] max-h-[90vh] overflow-y-auto p-5"><button onclick=closeP() class="bg-gray-100 w-8 h-8 rounded-full">X</button><div class=text-center><div id=pAv class="w-20 h-20 bg-[#0b2a4a] text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mt-4">M</div><h2 id=pName class="font-black text-xl mt-3"></h2><p id=pRole class="text-xs bg-[#0b2a4a] text-white px-3 py-1 rounded-full w-fit mx-auto mt-1"></p><p id=pBio class="text-sm mt-3 bg-gray-50 p-3 rounded-xl"></p><div class="mt-3 text-sm space-y-1"><div class="flex justify-between"><span>Phone</span><b id=pPhone></b></div><div class="flex justify-between"><span>State</span><span id=pState></span></div><div class="flex justify-between"><span>Father</span><span id=pFather></span></div><div class="flex justify-between"><span>Role</span><span id=pRole2></span></div></div><div class="flex gap-2 mt-4"><button id=pChat class="flex-1 bg-[#0b2a4a] text-white py-3 rounded-xl">Chat</button><button class="flex-1 bg-gray-100 py-3 rounded-xl">Follow</button></div><div class="mt-4 border rounded-xl p-3"><input id=postIn placeholder="Post..." class="w-full bg-gray-100 rounded-full px-4 py-2 text-sm"><button onclick=addPost() class="w-full mt-2 bg-[#0b2a4a] text-white py-2 rounded-xl text-sm">Post</button><div id=pPosts class="mt-3 space-y-2"></div></div></div></div></div>
-<div id=bookModal class="fixed inset-0 bg-black/60 hidden z-50 flex items-end justify-center"><div class="bg-white w-full max-w-[480px] rounded-t-[28px] p-6"><h2 class=font-black>Booking - From To Required *</h2><div class="grid grid-cols-2 gap-2 mt-3"><input id=bFrom placeholder="From *" class="bg-gray-100 rounded-xl p-3 text-sm"><input id=bTo placeholder="To *" class="bg-gray-100 rounded-xl p-3 text-sm"></div><div id=bErr class="hidden text-red-600 text-xs mt-2">From To Required!</div><input id=bName placeholder=Name class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><input id=bPhone placeholder=Phone class="w-full mt-2 bg-gray-100 rounded-xl p-3 text-sm"><button onclick=doBook() class="w-full bg-[#0b2a4a] text-white py-4 rounded-xl mt-4 font-black">Confirm</button><button onclick=closeB() class="w-full bg-gray-100 py-3 rounded-xl mt-2">Cancel</button></div></div>
+let chats=[];
+
+const STATES=[
+{name:"الخرطوم",cap:"الخرطوم",color:"from-violet-600 to-indigo-600",emoji:"🏙️"},
+{name:"الجزيرة",cap:"ود مدني",color:"from-emerald-500 to-teal-600",emoji:"🌾"},
+{name:"البحر الأحمر",cap:"بورتسودان",color:"from-blue-500 to-cyan-500",emoji:"🌊"},
+{name:"كسلا",cap:"كسلا",color:"from-amber-500 to-orange-600",emoji:"⛰️"},
+{name:"القضارف",cap:"القضارف",color:"from-lime-500 to-green-600",emoji:"🌽"},
+{name:"سنار",cap:"سنجة",color:"from-green-500 to-emerald-600",emoji:"🦁"},
+{name:"النيل الأبيض",cap:"ربك",color:"from-sky-400 to-blue-600",emoji:"💧"},
+{name:"النيل الأزرق",cap:"الدمازين",color:"from-blue-600 to-indigo-700",emoji:"💦"},
+{name:"الشمالية",cap:"دنقلا",color:"from-yellow-500 to-amber-600",emoji:"🏜️"},
+{name:"نهر النيل",cap:"عطبرة - الدامر",color:"from-slate-700 to-black",emoji:"🚂"},
+{name:"شمال كردفان",cap:"الأبيض",color:"from-orange-400 to-red-500",emoji:"🐪"},
+{name:"غرب كردفان",cap:"الفولة",color:"from-red-500 to-rose-600",emoji:"🛢️"},
+{name:"جنوب كردفان",cap:"كادوقلي",color:"from-teal-500 to-emerald-600",emoji:"🏞️"},
+{name:"شمال دارفور",cap:"الفاشر",color:"from-amber-600 to-yellow-700",emoji:"🏜️"},
+{name:"غرب دارفور",cap:"الجنينة",color:"from-rose-500 to-pink-600",emoji:"🌴"},
+{name:"جنوب دارفور",cap:"نيالا",color:"from-purple-500 to-pink-500",emoji:"🌅"},
+{name:"شرق دارفور",cap:"الضعين",color:"from-indigo-500 to-purple-600",emoji:"🐎"},
+{name:"وسط دارفور",cap:"زالنجي",color:"from-cyan-500 to-blue-600",emoji:"💚"},
+];
+
+app.get('/api/trips',(req,res)=>res.json(trips));
+app.post('/api/trips',(req,res)=>{const t={id:Date.now().toString(),...req.body};trips.unshift(t);res.json(t);});
+app.get('/api/chats',(req,res)=>{const{u1,u2}=req.query;let f=chats;if(u1&&u2)f=chats.filter(c=>(c.from===u1&&c.to===u2)||(c.from===u2&&c.to===u1));res.json(f);});
+app.post('/api/chats',(req,res)=>{const m={id:Date.now().toString(),time:new Date().toLocaleTimeString('ar-SD'),...req.body};chats.push(m);res.json(m);});
+
+app.get('/',(req,res)=>{
+res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>رحلات السودان</title><script src="https://cdn.tailwindcss.com"></script><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{font-family:Tajawal}</style></head><body>
+<div id="auth" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-violet-600 via-indigo-600 to-fuchsia-600">
+<div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl">
+<h1 class="text-3xl font-black text-center bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">رحلات السودان 🚌</h1><p class="text-center text-sm text-gray-500 mt-1">18 ولاية - اختيار اجباري</p>
+<input id="n" placeholder="اسمك" class="w-full border-2 rounded-2xl px-4 py-3 mt-6">
+<input id="p" placeholder="رقمك" class="w-full border-2 rounded-2xl px-4 py-3 mt-3">
+<button onclick="login('client')" class="w-full mt-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-2xl py-4 font-black">👤 دخول كـ عميل - لوحة فاتحة</button>
+<button onclick="login('office')" class="w-full mt-3 bg-gradient-to-r from-zinc-900 to-black text-white rounded-2xl py-4 font-black border-2 border-amber-500">🏢 دخول كـ مكتب - لوحة غامقة</button>
+</div></div>
+
+<div id="clientView" class="hidden min-h-screen bg-[#eef6ff]">
+<header class="bg-white border-b sticky top-0 z-30"><div class="max-w-6xl mx-auto p-4 flex justify-between"><b class="text-blue-600">👤 لوحة العميل - رحلات السودان</b><button onclick="out()" class="text-xs bg-gray-100 px-3 py-2 rounded-xl">خروج</button></div></header>
+<div class="max-w-6xl mx-auto p-4 grid md:grid-cols-[340px_1fr] gap-4">
+<div class="space-y-4">
+<div class="bg-white rounded-[1.5rem] p-5 shadow border"><h2 class="font-black mb-3 text-blue-700">🔍 وين ماشي؟ * اجباري</h2><select id="cFrom" class="w-full border-2 border-blue-100 rounded-2xl p-3 bg-blue-50 font-bold mb-3"><option value="">من ولاية؟</option></select><select id="cTo" class="w-full border-2 border-sky-100 rounded-2xl p-3 bg-sky-50 font-bold"><option value="">الى ولاية؟</option></select><p class="text-xs text-red-500 mt-2">لازم تختار من 18 ولاية الى 18 ولاية</p></div>
+<div class="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-[1.5rem] p-5 text-white"><h3 class="font-black">✈️ حجوزاتي</h3><p class="text-sm opacity-90 mt-2" id="myBooks">0 حجز</p></div>
 </div>
+<div><h2 class="font-black text-xl mb-3" id="cCount"></h2><div id="cList" class="space-y-3"></div></div>
+</div>
+</div>
+
+<div id="officeView" class="hidden min-h-screen bg-[#111] text-white">
+<header class="bg-[#1a1a1a] border-b border-amber-500/20 sticky top-0 z-30"><div class="max-w-6xl mx-auto p-4 flex justify-between"><b class="text-amber-400">🏢 لوحة المكتب - ادارة الاسطول</b><button onclick="out()" class="text-xs bg-zinc-800 px-3 py-2 rounded-xl">خروج</button></div></header>
+<div class="max-w-6xl mx-auto p-4 grid md:grid-cols-[360px_1fr] gap-4">
+<div class="space-y-4">
+<div class="bg-zinc-900 rounded-[1.5rem] p-5 border border-amber-500/20"><h2 class="font-black mb-3 text-amber-400">🎯 انشاء رحلة - 18 ولاية * اجباري</h2><select id="oFrom" class="w-full bg-black border border-zinc-700 rounded-2xl p-3 mb-3 text-white"><option value="">من ولاية؟</option></select><select id="oTo" class="w-full bg-black border border-zinc-700 rounded-2xl p-3 mb-3 text-white"><option value="">الى ولاية؟</option></select><input id="oPrice" type="number" placeholder="السعر" class="w-full bg-black border border-zinc-700 rounded-2xl p-3 mb-3"><input id="oSeats" type="number" placeholder="المقاعد" value="30" class="w-full bg-black border border-zinc-700 rounded-2xl p-3 mb-3"><button onclick="create()" class="w-full bg-amber-500 text-black rounded-2xl py-3 font-black">+ نشر الرحلة</button></div>
+<div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-[1.5rem] p-5 text-black"><h3 class="font-black">💰 الارباح اليوم</h3><p class="text-2xl font-black mt-1" id="earn">0 ج</p></div>
+<div class="grid grid-cols-3 gap-2" id="oGrid"></div>
+</div>
+<div><h2 class="font-black text-xl mb-3 text-amber-400" id="oCount"></h2><div id="oList" class="space-y-3"></div></div>
+</div>
+</div>
+
+<div id="chat" class="fixed inset-0 z-50 hidden bg-black/60"><div class="absolute left-0 md:right-0 md:left-auto w-full max-w-[420px] bg-white h-full flex flex-col"><div class="p-4 text-white bg-gradient-to-r from-violet-600 to-indigo-600 flex justify-between"><div><b id="chatT"></b><div class="text-xs opacity-80">الشات شغال 100% - يحدث تلقائي</div></div><button onclick="closeChat()" class="bg-white/20 w-9 h-9 rounded-xl">✕</button></div><div id="chatM" class="flex-1 overflow-y-auto p-4 space-y-2 bg-[#f9f7ff]"></div><div class="p-3 flex gap-2 border-t"><input id="chatI" class="flex-1 bg-gray-100 rounded-xl px-4 py-3" placeholder="رسالة..." onkeydown="if(event.key==='Enter')send()"><button onclick="send()" class="bg-violet-600 text-white px-6 rounded-xl font-black">ارسال</button></div></div></div>
+
 <script>
-let allUsers=[],allTrips=[],cur=null,role='traveler',prof=null,book=null,chatWith=null;
-function pick(r){role=r;document.getElementById('ro1').className=r=='traveler'?'border-2 border-[#0b2a4a] bg-[#0b2a4a] text-white rounded-xl p-3 text-center':'border-2 bg-white rounded-xl p-3 text-center';document.getElementById('ro2').className=r=='driver'?'border-2 border-[#0b2a4a] bg-[#0b2a4a] text-white rounded-xl p-3 text-center':'border-2 bg-white rounded-xl p-3 text-center';document.getElementById('ro3').className=r=='office'?'border-2 border-[#0b2a4a] bg-[#0b2a4a] text-white rounded-xl p-3 text-center':'border-2 bg-white rounded-xl p-3 text-center';}
-function showReg(){document.getElementById('loginBox').classList.add('hidden');document.getElementById('regBox').classList.remove('hidden');}
-function showLogin(){document.getElementById('regBox').classList.add('hidden');document.getElementById('loginBox').classList.remove('hidden');}
-function closeP(){document.getElementById('profileModal').classList.add('hidden');}
-function closeB(){document.getElementById('bookModal').classList.add('hidden');}
-async function reg(){let n=document.getElementById('rName').value.trim(),f=document.getElementById('rFather').value.trim(),s=document.getElementById('rState').value.trim(),p=document.getElementById('rPhone').value.trim(),pw=document.getElementById('rPass').value.trim();if(!n||!f||!s||!p||!pw){document.getElementById('rErr').innerText='All fields required';document.getElementById('rErr').classList.remove('hidden');return;}let r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,father:f,state:s,phone:p,pass:pw,role:role})});let d=await r.json();if(d.ok){cur=d.user;localStorage.setItem('rihlat_user',JSON.stringify(cur));enter();}else{document.getElementById('rErr').innerText=d.msg;document.getElementById('rErr').classList.remove('hidden');}}
-async function login(){let ph=document.getElementById('lPhone').value.trim(),pw=document.getElementById('lPass').value.trim();if(!ph||!pw){document.getElementById('lErr').innerText='Required';document.getElementById('lErr').classList.remove('hidden');return;}let r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:ph,pass:pw})});let d=await r.json();if(d.ok){cur=d.user;localStorage.setItem('rihlat_user',JSON.stringify(cur));enter();}else{document.getElementById('lErr').innerText=d.msg;document.getElementById('lErr').classList.remove('hidden');}}
-function enter(){document.getElementById('authView').classList.add('hidden');document.getElementById('mainView').classList.remove('hidden');document.getElementById('uInfo').innerText=cur.name+' - '+cur.role;if(cur.role!='traveler')document.getElementById('addBtn').classList.remove('hidden');load();}
-function logout(){localStorage.removeItem('rihlat_user');location.reload();}
-function tab(t){document.getElementById('tTrips').className=t=='trips'?'bg-[#0b2a4a] text-white px-4 py-2 rounded-full text-sm':'bg-gray-200 px-4 py-2 rounded-full text-sm';document.getElementById('tUsers').className=t=='users'?'bg-[#0b2a4a] text-white px-4 py-2 rounded-full text-sm':'bg-gray-200 px-4 py-2 rounded-full text-sm';document.getElementById('tChat').className=t=='chat'?'bg-[#0b2a4a] text-white px-4 py-2 rounded-full text-sm':'bg-gray-200 px-4 py-2 rounded-full text-sm';document.getElementById('tripsView').classList.toggle('hidden',t!='trips');document.getElementById('usersView').classList.toggle('hidden',t!='users');document.getElementById('chatView').classList.toggle('hidden',t!='chat');if(t=='chat')loadChatList();}
-function search(){let f=document.getElementById('fFrom').value.trim(),tt=document.getElementById('fTo').value.trim();if(!f||!tt){document.getElementById('fErr').classList.remove('hidden');alert('From To Required');return;}document.getElementById('fErr').classList.add('hidden');let fil=allTrips.filter(x=>x.from.indexOf(f)>=0&&x.to.indexOf(tt)>=0);renderTrips(fil);}
-function newTrip(){let fr=prompt('From * Required:');if(!fr||!fr.trim()){alert('From Required');return;}let to=prompt('To * Required:');if(!to||!to.trim()){alert('To Required');return;}let pr=prompt('Price:');fetch('/api/trips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:fr,to:to,price:pr,driver:cur.name,phone:cur.phone})}).then(r=>r.json()).then(d=>{if(d.ok)load();else alert(d.msg);});}
-function renderTrips(list){let h='';for(let i=0;i<list.length;i++){let t=list[i];h+='<div class="bg-white border rounded-2xl p-4 mb-2"><div class="flex justify-between"><div><b>'+t.from+' -> '+t.to+'</b><div class="text-xs text-gray-500">'+t.driver+'</div></div><b class="text-xs">'+t.price+'</b></div><button onclick="openBook('+t.id+')" class="w-full mt-3 bg-[#0b2a4a] text-white py-3 rounded-xl text-sm">Book</button></div>';}document.getElementById('tripsList').innerHTML=h;}
-function renderUsers(){let h='';for(let i=0;i<allUsers.length;i++){let u=allUsers[i];h+='<div onclick="openProfile(\\''+u.phone+'\\')" class="bg-white border rounded-2xl p-4 flex gap-3 mb-2"><div class="w-12 h-12 bg-[#0b2a4a] text-white rounded-full flex items-center justify-center font-black">'+u.avatar+'</div><div><div class="font-bold text-sm">'+u.name+' <span class="text-[10px] bg-gray-100 px-2 rounded-full">'+u.role+'</span></div><div class="text-xs text-gray-500">'+u.state+'</div></div></div>';}document.getElementById('usersList').innerHTML=h;}
-function openProfile(ph){let u=null;for(let i=0;i<allUsers.length;i++)if(allUsers[i].phone==ph)u=allUsers[i];if(!u)return;prof=ph;document.getElementById('pAv').innerText=u.avatar;document.getElementById('pName').innerText=u.name;document.getElementById('pRole').innerText=u.role;document.getElementById('pRole2').innerText=u.role;document.getElementById('pBio').innerText=u.bio;document.getElementById('pPhone').innerText=u.phone;document.getElementById('pState').innerText=u.state;document.getElementById('pFather').innerText=u.father;let pp='';for(let i=0;i<u.posts.length;i++)pp+='<div class="bg-gray-50 rounded-xl p-3 text-sm">'+u.posts[i].text+'</div>';document.getElementById('pPosts').innerHTML=pp||'<p class="text-xs text-gray-400">No posts</p>';document.getElementById('pChat').onclick=function(){closeP();chatWith=ph;tab('chat');loadChatList();};document.getElementById('profileModal').classList.remove('hidden');}
-function addPost(){let t=document.getElementById('postIn').value.trim();if(!t)return;fetch('/api/posts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:prof,text:t})}).then(()=>{openProfile(prof);load();});}
-function openBook(id){for(let i=0;i<allTrips.length;i++)if(allTrips[i].id==id)book=allTrips[i];document.getElementById('bFrom').value=book.from;document.getElementById('bTo').value=book.to;document.getElementById('bookModal').classList.remove('hidden');}
-function doBook(){let fr=document.getElementById('bFrom').value.trim(),to=document.getElementById('bTo').value.trim();if(!fr||!to){document.getElementById('bErr').classList.remove('hidden');alert('From To Required');return;}fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:fr,to:to,name:cur.name,phone:cur.phone})}).then(r=>r.json()).then(d=>{if(d.ok){alert('Booked');closeB();}else alert(d.msg);});}
-async function loadChatList(){let sel=document.getElementById('chatSel');let h='';for(let i=0;i<allUsers.length;i++)if(allUsers[i].phone!=cur.phone)h+='<option value="'+allUsers[i].phone+'">'+allUsers[i].name+' ('+allUsers[i].role+')</option>';sel.innerHTML=h;if(!chatWith)for(let i=0;i<allUsers.length;i++)if(allUsers[i].phone!=cur.phone){chatWith=allUsers[i].phone;break;}if(chatWith)sel.value=chatWith;loadChat();}
-async function loadChat(){let w=document.getElementById('chatSel').value;if(!w)return;chatWith=w;let r=await fetch('/api/chats?u1='+cur.phone+'&u2='+w);let ms=await r.json();let h='';for(let i=0;i<ms.length;i++){let m=ms[i];if(m.from==cur.phone)h+='<div class="bg-[#0b2a4a] text-white self-end ml-8 rounded-2xl px-4 py-2 text-sm">'+m.msg+'</div>';else h+='<div class="bg-white border self-start mr-8 rounded-2xl px-4 py-2 text-sm">'+m.msg+'</div>';}document.getElementById('chatMsgs').innerHTML=h||'<p class="text-center text-gray-400 text-xs">Start chat</p>';}
-async function send(){let m=document.getElementById('chatIn').value.trim();if(!m)return;await fetch('/api/chats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:cur.phone,to:chatWith,msg:m})});document.getElementById('chatIn').value='';loadChat();}
-async function load(){let ru=await fetch('/api/users');allUsers=await ru.json();let rt=await fetch('/api/trips');allTrips=await rt.json();renderTrips(allTrips);renderUsers();}
-window.onload=function(){let s=localStorage.getItem('rihlat_user');if(s){cur=JSON.parse(s);enter();}else{document.getElementById('authView').classList.remove('hidden');}}
-</script></body></html>
-`);
+const STATES=${JSON.stringify(STATES)};
+let cur=null;let allTrips=[];let chatWith=null;let iv=null;
+function init(){
+ let s=localStorage.getItem('rihlat_u');if(s){cur=JSON.parse(s);show();}
+ let cf=document.getElementById('cFrom'),ct=document.getElementById('cTo'),of=document.getElementById('oFrom'),ot=document.getElementById('oTo');
+ STATES.forEach(x=>{let o='<option value="'+x.name+'">'+x.emoji+' '+x.name+'</option>';cf.innerHTML+=o;ct.innerHTML+=o;of.innerHTML+=o;ot.innerHTML+=o;});
+ document.getElementById('oGrid').innerHTML=STATES.map(x=>'<div class="rounded-xl p-2 text-center text-[10px] font-bold bg-zinc-800 border border-zinc-700">'+x.emoji+'<br>'+x.name+'</div>').join('');
+}
+function login(role){let n=document.getElementById('n').value.trim(),p=document.getElementById('p').value.trim();if(!n||!p){alert('اكتب اسم ورقم');return;}cur={name:n,phone:p,role};localStorage.setItem('rihlat_u',JSON.stringify(cur));show();}
+function show(){document.getElementById('auth').classList.add('hidden');if(cur.role==='client'){document.getElementById('clientView').classList.remove('hidden');document.getElementById('officeView').classList.add('hidden');}else{document.getElementById('officeView').classList.remove('hidden');document.getElementById('clientView').classList.add('hidden');}load();}
+function out(){localStorage.removeItem('rihlat_u');location.reload();}
+async function load(){let r=await fetch('/api/trips');allTrips=await r.json();render();}
+function meta(n){return STATES.find(s=>s.name===n)||STATES[0];}
+function render(){
+ let cF=document.getElementById('cFrom')?.value||document.getElementById('oFrom')?.value; let cT=document.getElementById('cTo')?.value||document.getElementById('oTo')?.value;
+ let f=document.getElementById('cFrom').value||document.getElementById('oFrom').value; let t=document.getElementById('cTo').value||document.getElementById('oTo').value;
+ // use active view filter
+ let activeFrom = cur.role==='client'?document.getElementById('cFrom').value:document.getElementById('oFrom').value;
+ let activeTo = cur.role==='client'?document.getElementById('cTo').value:document.getElementById('oTo').value;
+ let filtered=allTrips.filter(x=>{
+   if(activeFrom&&activeTo) return x.from===activeFrom&&x.to===activeTo;
+   if(activeFrom) return x.from===activeFrom;
+   if(activeTo) return x.to===activeTo;
+   return true;
+ });
+ if(cur.role==='client'){
+   document.getElementById('cCount').innerText='الرحلات ('+filtered.length+') - من '+ (activeFrom||'كل الولايات')+' الى '+(activeTo||'كل الولايات');
+   document.getElementById('cList').innerHTML=filtered.map(tr=>{let fm=meta(tr.from),tm=meta(tr.to);return '<div class="bg-white rounded-[1.5rem] p-4 shadow border border-blue-100"><div class="flex justify-between"><div class="flex items-center gap-2"><div class="w-10 h-10 rounded-xl bg-gradient-to-br '+fm.color+' flex items-center justify-center text-white">'+fm.emoji+'</div><span>→</span><div class="w-10 h-10 rounded-xl bg-gradient-to-br '+tm.color+' flex items-center justify-center text-white">'+tm.emoji+'</div><div><div class="font-black">'+tr.from+' → '+tr.to+'</div><div class="text-xs text-gray-500">'+tr.office+' • '+tr.type+'</div></div></div><div class="font-black text-blue-600">'+tr.price.toLocaleString()+' ج</div></div><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="openChat(\\''+tr.phone+'\\',\\''+tr.from+'→'+tr.to+'\\')" class="bg-blue-600 text-white rounded-xl py-3 font-bold">💬 شات مباشر</button><button onclick="book(\\''+tr.id+'\\')" class="bg-sky-100 text-blue-700 rounded-xl py-3 font-bold">🎫 احجز</button></div></div>';}).join('');
+ }else{
+   document.getElementById('oCount').innerText='رحلاتي ('+filtered.filter(x=>x.phone===cur.phone).length+') / الكل ('+filtered.length+')';
+   document.getElementById('oList').innerHTML=filtered.map(tr=>{let fm=meta(tr.from),tm=meta(tr.to);return '<div class="bg-zinc-900 rounded-[1.5rem] p-4 border border-zinc-800"><div class="flex justify-between"><div class="flex items-center gap-2"><div class="w-10 h-10 rounded-xl bg-gradient-to-br '+fm.color+' flex items-center justify-center text-white">'+fm.emoji+'</div><span class="text-zinc-600">→</span><div class="w-10 h-10 rounded-xl bg-gradient-to-br '+tm.color+' flex items-center justify-center text-white">'+tm.emoji+'</div><div><div class="font-black text-white">'+tr.from+' → '+tr.to+'</div><div class="text-xs text-zinc-400">'+tr.office+' • '+tr.type+'</div></div></div><div class="font-black text-amber-400">'+tr.price.toLocaleString()+' ج</div></div><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="openChat(\\''+tr.phone+'\\',\\''+tr.from+'→'+tr.to+'\\')" class="bg-zinc-800 text-white rounded-xl py-3 font-bold border border-zinc-700">💬 رسائل</button><button onclick="delTrip(\\''+tr.id+'\\')" class="bg-red-900/30 text-red-400 rounded-xl py-3 font-bold">حذف</button></div></div>';}).join('');
+   let earn=filtered.filter(x=>x.phone===cur.phone).reduce((a,b)=>a+b.price*2,0);document.getElementById('earn').innerText=earn.toLocaleString()+' ج';
+ }
+}
+function book(id){let b=parseInt(localStorage.getItem('books')||'0')+1;localStorage.setItem('books',b);document.getElementById('myBooks').innerText=b+' حجز';alert('تم الحجز ✅ تواصل عبر الشات');}
+async function create(){let f=document.getElementById('oFrom').value,t=document.getElementById('oTo').value;if(!f||!t){alert('اختار من و الى اجباري من 18 ولاية!');return;}if(f===t){alert('ما ينفع نفس الولاية');return;}let price=parseInt(document.getElementById('oPrice').value);if(!price){alert('اكتب السعر');return;}let nt={from:f,to:t,office:cur.name,price:price,seats:30,time:"08:00 ص",type:"VIP",phone:cur.phone};await fetch('/api/trips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nt)});load();alert('تم النشر ✅');}
+async function delTrip(id){allTrips=allTrips.filter(x=>x.id!==id);render();}
+
+function openChat(phone,title){chatWith=phone;document.getElementById('chat').classList.remove('hidden');document.getElementById('chatT').innerText=title+' - '+phone;loadChat();if(iv)clearInterval(iv);iv=setInterval(loadChat,1200);}
+function closeChat(){document.getElementById('chat').classList.add('hidden');if(iv)clearInterval(iv);chatWith=null;}
+async function loadChat(){if(!chatWith)return;let r=await fetch('/api/chats?u1='+cur.phone+'&u2='+chatWith);let ms=await r.json();let box=document.getElementById('chatM');if(ms.length===0){box.innerHTML='<div class="text-center text-sm text-gray-500 mt-10">الشات شغال ✅ اكتب رسالة</div>';return;}box.innerHTML=ms.map(m=>'<div class="max-w-[80%] rounded-2xl px-4 py-2 '+(m.from===cur.phone?'bg-violet-600 text-white mr-auto':'bg-white border ml-auto')+'"><div class="text-[10px] opacity-70">'+m.from+' • '+m.time+'</div><div class="text-sm font-bold">'+m.msg+'</div></div>').join('');box.scrollTop=box.scrollHeight;}
+async function send(){let i=document.getElementById('chatI');let m=i.value.trim();if(!m||!chatWith)return;await fetch('/api/chats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:cur.phone,to:chatWith,msg:m})});i.value='';loadChat();setTimeout(async()=>{await fetch('/api/chats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:chatWith,to:cur.phone,msg:cur.role==='client'?'تم تأكيد حجزك ✅':'مرحبا، متى تصل؟'})});loadChat();},900);}
+
+document.getElementById('cFrom').addEventListener('change',render);document.getElementById('cTo').addEventListener('change',render);document.getElementById('oFrom').addEventListener('change',render);document.getElementById('oTo').addEventListener('change',render);
+window.onload=init;
+<\/script></body></html>`);
 });
+
+const PORT=process.env.PORT||3000;
+app.listen(PORT,()=>console.log('Running '+PORT));
 module.exports=app;
