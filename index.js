@@ -18,12 +18,12 @@ const save = () => {
 app.get('/', (req,res)=>{
 res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>رحلات السودان</title><script src="https://cdn.tailwindcss.com"></script><script src="/socket.io/socket.io.js"></script>
-<style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&display=swap');body{font-family:Cairo}.hide{display:none}</style>
+<style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap');body{font-family:Cairo}.hide{display:none}.fb-cover{background: linear-gradient(180deg,#0b2a4a 0%,#dbeafe 100%)}</style>
 </head>
-<body class="bg-[#eef3f7] min-h-screen">
+<body class="bg-[#f0f2f5] min-h-screen">
 
 <header class="bg-gradient-to-r from-[#0b2a4a] to-[#145ea8] text-white p-4 sticky top-0 z-50 shadow-lg">
-  <div class="max-w-md mx-auto text-center"><h1 class="font-black text-[22px]">رحلات السودان</h1><p class="text-[12px] opacity-90 -mt-1">نحو مستقبل أفضل</p></div>
+  <div class="max-w-md mx-auto flex justify-between items-center"><h1 class="font-black text-[20px]">رحلات السودان</h1><div onclick="openProfile(currentUser.phone)" class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center cursor-pointer"><img id="headerAvatar" class="w-9 h-9 rounded-full object-cover"></div></div>
 </header>
 
 <div class="max-w-md mx-auto p-3">
@@ -47,7 +47,6 @@ res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><
       <label class="text-[12px] font-bold block mb-1">رقم الهاتف *</label><input id="rPhone" placeholder="09xxxxxxxx" class="w-full border-2 rounded-xl p-3.5 mb-3">
       <label class="text-[12px] font-bold block mb-1">الاسم اليومي *</label><input id="rDailyName" placeholder="مثلا: أحمد" class="w-full border-2 rounded-xl p-3.5 mb-3">
       <label class="text-[12px] font-bold block mb-1">اسم الأب *</label><input id="rFather" placeholder="اسم الوالد" class="w-full border-2 rounded-xl p-3.5 mb-3">
-      <label class="text-[12px] font-bold block mb-1">رابط الصورة الشخصية</label><input id="rAvatar" placeholder="https://..." class="w-full border-2 rounded-xl p-3.5 mb-3">
       <label class="text-[12px] font-bold block mb-1">السكن - الولاية *</label><select id="rState" class="w-full border-2 rounded-xl p-3.5 bg-white mb-3"></select>
       <label class="text-[12px] font-bold block mb-1">نوع الحساب *</label>
       <div class="flex gap-2 mb-3">
@@ -61,11 +60,11 @@ res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><
   </div>
 
   <div id="mainScreen" class="hide">
-    <div class="bg-white rounded-2xl p-4 flex justify-between items-center mt-2 border">
+    <div class="bg-white rounded-2xl p-3 flex justify-between items-center mt-2 border shadow-sm">
       <div class="flex items-center gap-3 cursor-pointer" onclick="openProfile(currentUser.phone)">
-        <img id="myAvatar" src="" class="w-10 h-10 rounded-full bg-gray-200 object-cover"><div><div id="myName" class="font-black text-sm"></div><div id="myRole" class="text-[11px] text-gray-500"></div></div>
+        <img id="myAvatar" src="" class="w-10 h-10 rounded-full bg-gray-200 object-cover border"><div><div id="myName" class="font-black text-[14px]"></div><div id="myRole" class="text-[11px] text-gray-500"></div></div>
       </div>
-      <button onclick="logout()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-bold">خروج</button>
+      <button onclick="logout()" class="text-xs bg-[#f0f2f5] px-3 py-1.5 rounded-full font-bold">خروج</button>
     </div>
 
     <div id="officePanel" class="bg-white rounded-[22px] p-5 shadow border mt-4 hide">
@@ -76,34 +75,58 @@ res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><
       <button onclick="publishTrip()" class="w-full bg-blue-600 text-white rounded-xl py-3 font-black mt-3">نشر الرحلة</button>
     </div>
 
-    <div class="bg-white rounded-[22px] p-4 shadow border mt-4">
+    <div class="bg-white rounded-[22px] p-4 shadow-sm border mt-4">
       <h3 class="font-black text-[13px] mb-2">🔍 البحث عن الرحلات</h3>
-      <div class="flex gap-2"><div class="flex-1"><label class="text-[10px] font-bold">من اين؟</label><select id="searchFrom" class="w-full border-2 rounded-xl p-3 bg-white text-sm"></select></div><div class="flex-1"><label class="text-[10px] font-bold">الى اين؟</label><select id="searchTo" class="w-full border-2 rounded-xl p-3 bg-white text-sm"></select></div><button onclick="loadTrips()" class="bg-black text-white px-5 rounded-xl font-black text-sm h-[48px] mt-[18px]">بحث</button></div>
+      <div class="flex gap-2"><div class="flex-1"><select id="searchFrom" class="w-full border rounded-xl p-3 bg-[#f0f2f5] text-sm"></select></div><div class="flex-1"><select id="searchTo" class="w-full border rounded-xl p-3 bg-[#f0f2f5] text-sm"></select></div><button onclick="loadTrips()" class="bg-black text-white px-5 rounded-xl font-black text-sm">بحث</button></div>
     </div>
 
     <div id="tripsList" class="space-y-3 mt-3"></div>
 
-    <div class="bg-white rounded-[22px] p-0 shadow border mt-6 overflow-hidden">
-      <div class="p-4 bg-gray-50 border-b flex justify-between"><span class="font-black text-sm">💬 المراسلات</span><span id="chatTarget" class="text-[11px] text-gray-500">اختر شخص للمراسلة</span></div>
-      <div id="chatBox" class="h-[300px] overflow-y-auto p-3 space-y-2 bg-[#f8fbff]"></div>
-      <div class="p-2 flex gap-2 border-t"><input id="chatInput" placeholder="اكتب رسالة..." class="flex-1 border-2 rounded-full px-4 py-2.5 text-sm"><button onclick="sendMsg()" class="bg-black text-white px-5 rounded-full font-black text-sm">إرسال</button></div>
+    <!-- شات فيسبوك -->
+    <div class="bg-white rounded-[22px] shadow border mt-6 overflow-hidden">
+      <div class="p-3 flex gap-2 border-b bg-white">
+        <button onclick="switchChatTab('chats')" id="chatTabBtn" class="flex-1 bg-black text-white py-2 rounded-full font-black text-[12px]">المحادثات</button>
+        <button onclick="switchChatTab('contacts')" id="contactTabBtn" class="flex-1 bg-[#f0f2f5] py-2 rounded-full font-black text-[12px]">جهات الاتصال</button>
+      </div>
+      <div id="contactsList" class="hide max-h-[250px] overflow-y-auto"></div>
+      <div id="chatArea">
+        <div class="p-3 bg-gray-50 border-b flex justify-between items-center"><div class="flex items-center gap-2"><img id="chatAvatar" class="w-8 h-8 rounded-full bg-gray-200 hidden"><span id="chatTarget" class="text-[12px] font-bold">اختر شخص من جهات الاتصال</span><span id="onlineDot" class="w-2 h-2 bg-green-500 rounded-full hidden"></span></div><button onclick="closeChat()" class="text-[11px] bg-gray-200 px-2 py-1 rounded-full">إغلاق</button></div>
+        <div id="chatBox" class="h-[320px] overflow-y-auto p-3 space-y-2 bg-white"></div>
+        <div class="p-2 flex gap-2 border-t bg-white"><input id="chatInput" placeholder="Aa" class="flex-1 bg-[#f0f2f5] rounded-full px-4 py-2.5 text-sm outline-none"><button onclick="sendMsg()" class="bg-blue-600 text-white w-10 h-10 rounded-full font-black">➤</button></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- مودال الملف الشخصي -->
-<div id="profileModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4">
-  <div class="bg-white rounded-[24px] p-6 w-full max-w-sm">
-    <div class="flex justify-between"><h3 class="font-black">الملف الشخصي</h3><button onclick="closeProfile()" class="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
-    <div class="text-center mt-4">
-      <img id="pAvatar" src="" class="w-24 h-24 rounded-full mx-auto object-cover bg-gray-200 border-4 border-blue-100">
-      <div id="pName" class="font-black text-lg mt-3"></div>
-      <div id="pFather" class="text-sm text-gray-500"></div>
-      <div id="pState" class="text-xs bg-blue-50 text-blue-600 inline-block px-3 py-1 rounded-full mt-2"></div>
-      <div id="pRole" class="text-xs bg-black text-white inline-block px-3 py-1 rounded-full mt-1 mr-1"></div>
-      <div id="pPhone" class="text-sm font-bold mt-3"></div>
+<!-- بروفايل فيسبوك -->
+<div id="profileModal" class="fixed inset-0 bg-black/60 z-[100] hidden items-start justify-center p-0 overflow-y-auto">
+  <div class="bg-[#f0f2f5] w-full max-w-md min-h-screen">
+    <div class="bg-white shadow-sm">
+      <div class="fb-cover h-[180px] relative"><button onclick="closeProfile()" class="absolute top-3 left-3 bg-black/50 text-white w-9 h-9 rounded-full">✕</button></div>
+      <div class="px-4 pb-4">
+        <div class="flex items-end gap-4 -mt-10">
+          <img id="pAvatar" src="" class="w-[88px] h-[88px] rounded-full border-[4px] border-white object-cover bg-gray-200 shadow">
+          <div class="pb-2"><div id="pName" class="font-black text-[20px] leading-6"></div><div id="pFather" class="text-[13px] text-gray-600"></div></div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button id="pChatBtn" class="flex-1 bg-blue-600 text-white rounded-lg py-2.5 font-black text-sm">💬 مراسلة</button>
+          <button class="flex-1 bg-[#e4e6eb] rounded-lg py-2.5 font-black text-sm">👤 صديق</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+          <div class="bg-[#f0f2f5] rounded-xl p-2"><div id="pTripCount" class="font-black">0</div><div class="text-[10px] text-gray-500">رحلة</div></div>
+          <div class="bg-[#f0f2f5] rounded-xl p-2"><div id="pState" class="font-black text-[11px]"></div><div class="text-[10px] text-gray-500">السكن</div></div>
+          <div class="bg-[#f0f2f5] rounded-xl p-2"><div id="pRole" class="font-black text-[11px]"></div><div class="text-[10px] text-gray-500">النوع</div></div>
+        </div>
+        <div class="mt-4 space-y-2">
+          <div class="flex gap-2 text-[13px]"><span>📞</span><span id="pPhone" class="font-bold"></span></div>
+          <div class="flex gap-2 text-[13px]"><span>🏠</span><span>يعيش في <b id="pState2"></b></span></div>
+        </div>
+      </div>
     </div>
-    <button id="pChatBtn" class="w-full bg-blue-600 text-white rounded-xl py-3 font-black mt-5">💬 مراسلة</button>
+    <div class="bg-white mt-2 p-3">
+      <h4 class="font-black text-sm mb-2">الرحلات المنشورة</h4>
+      <div id="pTrips" class="space-y-2"></div>
+    </div>
   </div>
 </div>
 
@@ -111,6 +134,7 @@ res.send(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><
 const socket = io();
 let currentUser = JSON.parse(localStorage.getItem('user')||'null');
 let currentChatUser = null;
+let currentChatPhone = null;
 let allTrips = [];
 let allUsersCache = [];
 
@@ -119,8 +143,12 @@ const SUDAN_STATES = ["الخرطوم","نهر النيل - عطبرة","الش�
 function fillSelects(){
   const opts = SUDAN_STATES.map(s=>\`<option>\${s}</option>\`).join('');
   const optsWithAll = '<option value="">الكل</option>' + opts;
-  rState.innerHTML = opts; from.innerHTML = opts; to.innerHTML = opts; searchFrom.innerHTML = optsWithAll; searchTo.innerHTML = optsWithAll;
-  rState.value = "نهر النيل - عطبرة";
+  document.getElementById('rState').innerHTML = opts;
+  document.getElementById('from').innerHTML = opts;
+  document.getElementById('to').innerHTML = opts;
+  document.getElementById('searchFrom').innerHTML = optsWithAll;
+  document.getElementById('searchTo').innerHTML = optsWithAll;
+  document.getElementById('rState').value = "نهر النيل - عطبرة";
 }
 function showTab(t){
   loginBox.classList.toggle('hide', t!=='login'); registerBox.classList.toggle('hide', t!=='register');
@@ -128,7 +156,16 @@ function showTab(t){
   tabReg.className = t=='register' ? 'flex-1 py-2.5 rounded-full font-black bg-black text-white text-sm' : 'flex-1 py-2.5 rounded-full font-black text-gray-500 text-sm';
 }
 function checkAuth(){
-  if(currentUser){ authScreen.classList.add('hide'); mainScreen.classList.remove('hide'); myName.innerText = currentUser.dailyName; myRole.innerText = currentUser.role + ' - ' + currentUser.state; myAvatar.src = currentUser.avatar || 'https://ui-avatars.com/api/?name='+currentUser.dailyName+'&background=0b2a4a&color=fff'; if(currentUser.role==='مكتب') officePanel.classList.remove('hide'); fillSelects(); loadTrips(); } else { fillSelects(); }
+  if(currentUser){
+    authScreen.classList.add('hide'); mainScreen.classList.remove('hide');
+    const av = currentUser.avatar;
+    document.getElementById('myName').innerText = currentUser.dailyName;
+    document.getElementById('myRole').innerText = currentUser.role + ' - ' + currentUser.state;
+    document.getElementById('myAvatar').src = av;
+    document.getElementById('headerAvatar').src = av;
+    if(currentUser.role==='مكتب') officePanel.classList.remove('hide');
+    fillSelects(); loadTrips(); loadContacts();
+  } else { fillSelects(); }
 }
 checkAuth();
 
@@ -136,7 +173,8 @@ async function register(){
   if(rPass.value!==rPass2.value) return alert('كلمة السر غير متطابقة');
   if(!rPhone.value||!rDailyName.value||!rFather.value) return alert('أكمل البيانات');
   let role = document.querySelector('input[name="role"]:checked').value;
-  let data={phone:rPhone.value,dailyName:rDailyName.value,father:rFather.value,avatar:rAvatar.value,state:rState.value,role:role,pass:rPass.value};
+  let avatar = 'https://ui-avatars.com/api/?name='+encodeURIComponent(rDailyName.value)+'&background=0b2a4a&color=fff&size=200';
+  let data={phone:rPhone.value,dailyName:rDailyName.value,father:rFather.value,avatar:avatar,state:rState.value,role:role,pass:rPass.value};
   let res=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   let txt=await res.text(); alert(txt); if(res.ok) showTab('login');
 }
@@ -163,70 +201,55 @@ async function loadTrips(){
   if(filtered.length==0){ tripsList.innerHTML='<div class="bg-white p-6 rounded-2xl border text-center text-sm text-gray-500">لا توجد رحلات</div>'; return; }
   tripsList.innerHTML=filtered.map(t=>{
     const isBooked = booked.includes(t.id);
-    return \`<div class="bg-white p-4 rounded-2xl border flex justify-between items-center">
+    return \`<div class="bg-white p-3 rounded-2xl border shadow-sm flex justify-between items-center">
       <div class="flex gap-3 items-center">
-        <img onclick="openProfile('\${t.phone}')" src="\${t.officeAvatar || 'https://ui-avatars.com/api/?name='+t.office+'&background=0b2a4a&color=fff'}" class="w-10 h-10 rounded-full object-cover cursor-pointer border">
-        <div><div class="font-black text-sm cursor-pointer" onclick="openProfile('\${t.phone}')">\${t.from} → \${t.to}</div><div class="text-[11px] text-gray-500">\${t.date} \${t.time} | <span class="underline cursor-pointer" onclick="openProfile('\${t.phone}')">\${t.office}</span> - \${t.phone}</div></div>
+        <img onclick="openProfile('\${t.phone}')" src="\${t.officeAvatar}" class="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-white shadow">
+        <div><div class="font-black text-[13px] cursor-pointer" onclick="openProfile('\${t.phone}')">\${t.from} → \${t.to}</div><div class="text-[11px] text-gray-500"><span class="underline cursor-pointer" onclick="openProfile('\${t.phone}')">\${t.office}</span> • \${t.date}</div></div>
       </div>
-      <div class="text-left flex flex-col gap-1">
-        <div class="font-black text-blue-600 text-[14px]">\${t.price} ج</div>
-        \${!isBooked ? \`<button onclick="bookTrip('\${t.id}')" class="text-[11px] bg-black text-white px-4 py-1.5 rounded-full font-bold">إضافة</button>\` : \`<div class="text-[11px] bg-green-100 text-green-700 px-3 py-1 rounded-full font-black text-center">تمت الإضافة ✓</div><button onclick="cancelTrip('\${t.id}')" class="text-[11px] bg-red-500 text-white px-4 py-1.5 rounded-full font-bold">إلغاء</button>\`}
+      <div class="text-left flex flex-col gap-1 items-end">
+        <div class="font-black text-blue-600 text-[13px]">\${t.price} ج</div>
+        \${!isBooked ? \`<button onclick="bookTrip('\${t.id}')" class="text-[11px] bg-[#e4e6eb] px-4 py-1.5 rounded-full font-bold">إضافة</button>\` : \`<div class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-full font-black">تمت ✓</div><button onclick="cancelTrip('\${t.id}')" class="text-[10px] bg-red-500 text-white px-3 py-1 rounded-full font-bold">إلغاء</button>\`}
       </div>
     </div>\`;
   }).join('');
 }
 
-// الملف الشخصي
+function switchChatTab(tab){
+  if(tab==='contacts'){ contactsList.classList.remove('hide'); chatArea.classList.add('hide'); contactTabBtn.className='flex-1 bg-black text-white py-2 rounded-full font-black text-[12px]'; chatTabBtn.className='flex-1 bg-[#f0f2f5] py-2 rounded-full font-black text-[12px]'; }
+  else{ contactsList.classList.add('hide'); chatArea.classList.remove('hide'); chatTabBtn.className='flex-1 bg-black text-white py-2 rounded-full font-black text-[12px]'; contactTabBtn.className='flex-1 bg-[#f0f2f5] py-2 rounded-full font-black text-[12px]'; }
+}
+
+async function loadContacts(){
+  let res = await fetch('/api/users'); allUsersCache = await res.json();
+  let others = allUsersCache.filter(u=>u.phone!==currentUser.phone);
+  contactsList.innerHTML = others.map(u=>\`<div onclick="openProfile('\${u.phone}')" class="flex gap-3 items-center p-3 hover:bg-[#f0f2f5] cursor-pointer border-b">
+    <div class="relative"><img src="\${u.avatar}" class="w-12 h-12 rounded-full object-cover"><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span></div>
+    <div class="flex-1"><div class="font-black text-[13px]">\${u.dailyName}</div><div class="text-[11px] text-gray-500">\${u.role} • \${u.state}</div></div>
+    <button onclick="event.stopPropagation(); startChat('\${u.dailyName}','\${u.phone}','\${u.avatar}')" class="bg-[#e4e6eb] w-8 h-8 rounded-full">💬</button>
+  </div>\`).join('') || '<div class="p-6 text-center text-sm text-gray-400">لا يوجد مستخدمين</div>';
+}
+
 async function openProfile(phone){
   let res = await fetch('/api/users'); allUsersCache = await res.json();
   let user = allUsersCache.find(u=>u.phone==phone);
   if(!user) return alert('الملف غير موجود');
-  pAvatar.src = user.avatar || 'https://ui-avatars.com/api/?name='+user.dailyName+'&background=0b2a4a&color=fff';
-  pName.innerText = user.dailyName; pFather.innerText = 'ابن: ' + user.father; pState.innerText = user.state; pRole.innerText = user.role; pPhone.innerText = user.phone;
-  pChatBtn.onclick = ()=>{ closeProfile(); startChat(user.dailyName, user.phone); };
+  let tr = await fetch('/api/trips'); let tripsData = await tr.json();
+  let myTrips = tripsData.filter(t=>t.phone==phone);
+  document.getElementById('pAvatar').src = user.avatar;
+  document.getElementById('pName').innerText = user.dailyName;
+  document.getElementById('pFather').innerText = user.father + ' - ابن';
+  document.getElementById('pState').innerText = user.state;
+  document.getElementById('pState2').innerText = user.state;
+  document.getElementById('pRole').innerText = user.role;
+  document.getElementById('pPhone').innerText = user.phone;
+  document.getElementById('pTripCount').innerText = myTrips.length;
+  document.getElementById('pTrips').innerHTML = myTrips.length ? myTrips.map(t=>\`<div class="border rounded-xl p-3 text-[12px] flex justify-between"><span>\${t.from} → \${t.to}</span><span class="font-black text-blue-600">\${t.price} ج</span></div>\`).join('') : '<div class="text-center text-xs text-gray-400">لم ينشر أي رحلة</div>';
+  document.getElementById('pChatBtn').onclick = ()=>{ closeProfile(); startChat(user.dailyName, user.phone, user.avatar); };
   profileModal.classList.remove('hidden'); profileModal.classList.add('flex');
 }
 function closeProfile(){ profileModal.classList.add('hidden'); profileModal.classList.remove('flex'); }
 
-function startChat(name, phone){
-  currentChatUser = name;
-  chatTarget.innerText = 'تتحدث مع: ' + name + ' ('+phone+')';
-  loadMessages();
-  document.getElementById('chatBox').scrollIntoView({behavior:'smooth'});
-}
-function loadMessages(){
-  if(!currentChatUser) return;
-  fetch('/api/messages').then(r=>r.json()).then(ms=>{
-    let filtered = ms.filter(m=> (m.from===currentUser.dailyName && m.to===currentChatUser) || (m.to===currentUser.dailyName && m.from===currentChatUser));
-    chatBox.innerHTML = filtered.map(m=>\`<div class="\${m.from===currentUser.dailyName?'bg-blue-600 text-white ml-8':'bg-white border mr-8'} p-2.5 rounded-2xl text-[13px]"><b class="text-[10px] block opacity-70">\${m.from}</b>\${m.text}</div>\`).join('') || '<div class="text-center text-xs text-gray-400 mt-10">ابدأ المحادثة الآن</div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
-}
-function sendMsg(){
-  if(!currentChatUser) return alert('افتح ملف شخصي واضغط مراسلة أولا');
-  if(!chatInput.value) return;
-  let msg={from:currentUser.dailyName,to:currentChatUser,text:chatInput.value,time:Date.now()};
-  socket.emit('chat',msg); chatInput.value=''; setTimeout(loadMessages,300);
-}
-socket.on('chat', ()=>{ loadMessages(); });
-</script>
-</body></html>`);
-});
-
-app.post('/api/register',(req,res)=>{
-  let u=users.find(x=>x.phone==req.body.phone);
-  if(u) return res.status(400).send('رقم الهاتف مسجل مسبقا');
-  users.push(req.body); save(); res.send('تم إنشاء الحساب بنجاح');
-});
-app.post('/api/login',(req,res)=>{
-  let u=users.find(x=>x.phone==req.body.phone && x.pass==req.body.pass);
-  if(!u) return res.json({ok:false,msg:'رقم أو كلمة سر خطأ'});
-  res.json({ok:true,user:u});
-});
-app.get('/api/users',(req,res)=>res.json(users));
-app.get('/api/trips',(req,res)=>res.json(trips.slice().reverse()));
-app.post('/api/trips',(req,res)=>{ const newTrip = { id: Date.now().toString(), ...req.body }; trips.push(newTrip); save(); res.json({ok:true}); });
-app.get('/api/messages',(req,res)=>res.json(messages));
-io.on('connection',socket=>{ socket.on('chat',msg=>{ io.emit('chat',msg); messages.push(msg); save(); }); });
-http.listen(3000,()=>console.log('رحلات السودان شغال - ملفات شخصية + مراسلة'));
-
+function startChat(name, phone, avatar){
+  currentChatUser = name; currentChatPhone = phone;
+  document.getElementById('chatTarget').innerText = name;
+  if(avatar){ document.getElementById('chatAvatar').src=avatar; document.getElementById('chatAvatar').classLi
