@@ -1,7 +1,6 @@
 {
-  "name": "safarni-app",
+  "name": "rihlat-sudan",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": { "start": "node index.js" },
-  "dependencies": { "express": "^4.18.2", "socket.io": "^4.7.4" }
+  "main": "api/index.js",
+  "dependencies": { "express": "^4.18.2" }
 }
