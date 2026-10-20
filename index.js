@@ -253,3 +253,7 @@ function startChat(name, phone, avatar){
   currentChatUser = name; currentChatPhone = phone;
   document.getElementById('chatTarget').innerText = name;
   if(avatar){ document.getElementById('chatAvatar').src=avatar; document.getElementById('chatAvatar').classLi
+
+
+// Fix for Vercel
+module.exports = app;
